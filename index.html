@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANYHOME - Where Design Meets Tomorrow</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Day Theme - Warm, Bright, Airy */
+            --day-bg-primary: #FEFCF7;
+            --day-bg-secondary: #F5F1E8;
+            --day-text-primary: #2C2C2C;
+            --day-text-secondary: #6B6B6B;
+            --day-accent: #D4A574;
+            --day-accent-hover: #B8935F;
+            --day-card-bg: #FFFFFF;
+            --day-border: #E8E4DC;
+            --day-overlay: rgba(255, 255, 255, 0.7);
+            --day-shadow: rgba(0, 0, 0, 0.08);
+            
+            /* Night Theme - Dark, Moody, Luxurious */
+            --night-bg-primary: #0A0A0F;
+            --night-bg-secondary: #14141E;
+            --night-text-primary: #F8F8F0;
+            --night-text-secondary: #A0A0B0;
+            --night-accent: #FF9F43;
+            --night-accent-hover: #FF8C42;
+            --night-card-bg: #1A1A2E;
+            --night-border: #2A2A3E;
+            --night-overlay: rgba(0, 0, 0, 0.5);
+            --night-shadow: rgba(0, 0, 0, 0.4);
+            
+            /* Current theme variables */
+            --bg-primary: var(--night-bg-primary);
+            --bg-secondary: var(--night-bg-secondary);
+            --text-primary: var(--night-text-primary);
+            --text-secondary: var(--night-text-secondary);
+            --accent: var(--night-accent);
+            --accent-hover: var(--night-accent-hover);
+            --card-bg: var(--night-card-bg);
+            --border: var(--night-border);
+            --overlay: var(--night-overlay);
+            --shadow: var(--night-shadow);
+        }
+
+        body.day-mode {
+            --bg-primary: var(--day-bg-primary);
+            --bg-secondary: var(--day-bg-secondary);
+            --text-primary: var(--day-text-primary);
+            --text-secondary: var(--day-text-secondary);
+            --accent: var(--day-accent);
+            --accent-hover: var(--day-accent-hover);
+            --card-bg: var(--day-card-bg);
+            --border: var(--day-border);
+            --overlay: var(--day-overlay);
+            --shadow: var(--day-shadow);
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+
+        body {
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.8s ease, color 0.8s ease;
+        }
+
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        /* HERO SECTION - NYC AERIAL VIEW */
+        .hero-section {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .hero-bg-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 1s ease, transform 1.5s ease;
+        }
+
+        .hero-bg-img.day-img {
+            opacity: 0;
+            transform: scale(1.1);
+        }
+
+        .hero-bg-img.night-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        body.day-mode .hero-bg-img.day-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        body.day-mode .hero-bg-img.night-img {
+            opacity: 0;
+            transform: scale(1.1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--overlay);
+            transition: background 1s ease;
+            z-index: 2;
+        }
+
+        /* Window Lights - Night Only */
+        .window-lights {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        body.day-mode .window-lights {
+            opacity: 0;
+        }
+
+        .window {
+            position: absolute;
+            width: 2px;
+            height: 3px;
+            background: #FFD700;
+            border-radius: 1px;
+            opacity: 0;
+            box-shadow: 0 0 6px #FFD700;
+        }
+
+        .window.active {
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 4px #FFD700; }
+            50% { opacity: 1; box-shadow: 0 0 12px #FFD700, 0 0 20px rgba(255, 215, 0, 0.4); }
+        }
+
+        /* DAY/NIGHT TOGGLE */
+        .mode-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.8s ease;
+        }
+
+        body.day-mode .mode-toggle {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0.5;
+        }
+
+        body.day-mode .mode-btn {
+            color: var(--day-text-primary);
+        }
+
+        .mode-btn svg {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        body.day-mode .mode-btn.active {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        body.day-mode .toggle-divider {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* HERO CONTENT */
+        .hero-content {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 22px 56px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            border: 2px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: transparent;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        body.day-mode .explore-btn {
+            border-color: var(--day-text-primary);
+            color: var(--day-text-primary);
+        }
+
+        .explore-btn:hover {
+            transform: translateY(-3px);
+            background: white;
+            color: #1a1a2e;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        body.day-mode .explore-btn:hover {
+            background: var(--day-text-primary);
+            color: white;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* SHOP THE LOOK SECTION */
+        .shop-look-section {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            transition: background 0.8s ease;
+            overflow: hidden;
+        }
+
+        .shop-look-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .shop-look-slider {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .shop-look-slide {
+            min-width: 100vw;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, var(--overlay) 0%, transparent 60%);
+            transition: background 0.8s ease;
+        }
+
+        .slide-content {
+            position: absolute;
+            left: 60px;
+            bottom: 140px;
+            color: white;
+            z-index: 10;
+            max-width: 500px;
+        }
+
+        body.day-mode .slide-content {
+            color: var(--day-text-primary);
+        }
+
+        .slide-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 16px;
+            transition: color 0.8s ease;
+        }
+
+        body.day-mode .slide-label {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .slide-title {
+            font-family: var(--font-display);
+            font-size: clamp(40px, 6vw, 64px);
+            margin-bottom: 16px;
+            line-height: 1.1;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        body.day-mode .slide-title {
+            text-shadow: none;
+        }
+
+        .slide-description {
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 32px;
+            max-width: 400px;
+            transition: color 0.8s ease;
+        }
+
+        body.day-mode .slide-description {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .shop-now-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            background: white;
+            color: #1a1a2e;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        body.day-mode .shop-now-btn {
+            background: var(--day-text-primary);
+            color: white;
+        }
+
+        .shop-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Slider Navigation */
+        .slider-nav {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 20;
+        }
+
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.day-mode .slider-dot {
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .slider-dot.active {
+            background: white;
+            border-color: white;
+            transform: scale(1.2);
+        }
+
+        body.day-mode .slider-dot.active {
+            background: var(--day-text-primary);
+            border-color: var(--day-text-primary);
+        }
+
+        .slider-arrows {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .slider-arrow {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            backdrop-filter: blur(10px);
+        }
+
+        body.day-mode .slider-arrow {
+            border-color: rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--day-text-primary);
+        }
+
+        .slider-arrow:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        body.day-mode .slider-arrow:hover {
+            background: white;
+            border-color: var(--day-text-primary);
+        }
+
+        .slider-arrow svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        /* PRODUCT MODAL */
+        .product-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .product-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .product-modal {
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 30px 60px -15px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9) translateY(30px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s ease;
+            overflow: hidden;
+        }
+
+        .product-modal-overlay.active .product-modal {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            transition: all 0.8s ease;
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            color: var(--text-primary);
+            margin: 0;
+            transition: color 0.8s ease;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--border);
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 20px 28px;
+            overflow-y: auto;
+            flex: 1;
+            background: var(--bg-primary);
+            transition: background 0.8s ease;
+        }
+
+        .modal-products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-product {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s, background 0.8s ease;
+        }
+
+        .modal-product.removed {
+            opacity: 0.5;
+            background: var(--border);
+        }
+
+        .modal-product.removed .product-img {
+            filter: grayscale(100%);
+        }
+
+        .modal-product.removed .product-name,
+        .modal-product.removed .product-price {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .product-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            transition: color 0.8s ease;
+        }
+
+        .product-price {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.8s ease;
+        }
+
+        .product-original-price {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+            margin-left: 8px;
+            font-size: 13px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .btn-toggle:hover {
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+
+        .btn-toggle svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .btn-add-back {
+            padding: 8px 16px;
+            background: #2ed573;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-back:hover {
+            background: #26b965;
+        }
+
+        .modal-footer {
+            padding: 20px 28px;
+            background: var(--bg-secondary);
+            border-top: 2px solid var(--border);
+            transition: all 0.8s ease;
+        }
+
+        .modal-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .items-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.8s ease;
+        }
+
+        .total-price {
+            text-align: right;
+        }
+
+        .total-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: color 0.8s ease;
+        }
+
+        .total-amount {
+            font-family: var(--font-display);
+            font-size: 32px;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: color 0.8s ease;
+        }
+
+        .total-amount .currency {
+            font-size: 20px;
+            vertical-align: top;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            padding: 16px 24px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-cart:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-buy-look {
+            flex: 1;
+            padding: 16px 24px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-buy-look:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-buy-look:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* LIFESTYLE COLLAGE - WITH IMAGES */
+        .lifestyle-section {
+            padding: 100px 0;
+            background: var(--bg-secondary);
+            transition: background 0.8s ease;
+            overflow: hidden;
+        }
+
+        .lifestyle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: -40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .lifestyle-card {
+            width: 200px;
+            height: 280px;
+            border-radius: 16px;
+            margin-left: -40px;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px var(--shadow);
+            cursor: pointer;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .lifestyle-card:first-child {
+            margin-left: 0;
+        }
+
+        .lifestyle-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .lifestyle-card:hover {
+            transform: translateY(-30px) scale(1.05);
+            z-index: 10;
+            box-shadow: 0 30px 60px var(--shadow);
+        }
+
+        .lifestyle-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .lifestyle-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .lifestyle-card:hover .lifestyle-overlay {
+            opacity: 1;
+        }
+
+        .lifestyle-title {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* CATEGORIES SLIDER */
+        .categories-section {
+            padding: 80px 0;
+            background: var(--bg-primary);
+            transition: background 0.8s ease;
+            overflow: hidden;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            transition: color 0.8s ease;
+        }
+
+        .categories-wrapper {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 60px;
+        }
+
+        .categories-slider {
+            display: flex;
+            gap: 24px;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category-card {
+            min-width: calc(20% - 19.2px);
+            aspect-ratio: 1;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .category-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+
+        .category-name {
+            font-family: var(--font-display);
+            font-size: 18px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .category-line {
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.4s ease;
+        }
+
+        .category-card:hover .category-line {
+            width: 40px;
+        }
+
+        .cat-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .cat-arrow:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .cat-arrow.prev { left: 20px; }
+        .cat-arrow.next { right: 20px; }
+
+        .cat-arrow svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            fill: none;
+            stroke: currentColor;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .category-card {
+                min-width: calc(25% - 18px);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .slide-content {
+                left: 40px;
+                bottom: 120px;
+            }
+            
+            .category-card {
+                min-width: calc(33.333% - 16px);
+            }
+
+            .lifestyle-card {
+                width: 160px;
+                height: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mode-toggle {
+                top: 20px;
+                right: 20px;
+                transform: scale(0.9);
+            }
+
+            .explore-btn {
+                padding: 18px 40px;
+                font-size: 13px;
+            }
+
+            .slide-content {
+                left: 24px;
+                right: 24px;
+                bottom: 100px;
+                text-align: center;
+            }
+
+            .slide-title {
+                font-size: 36px;
+            }
+
+            .slider-arrows {
+                display: none;
+            }
+
+            .category-card {
+                min-width: calc(50% - 12px);
+            }
+
+            .categories-wrapper {
+                padding: 0 40px;
+            }
+
+            .lifestyle-card {
+                width: 140px;
+                height: 200px;
+                margin-left: -30px;
+            }
+
+            .product-modal {
+                max-height: 90vh;
+                width: 95%;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .category-card {
+                min-width: calc(100% - 0px);
+            }
+
+            .lifestyle-container {
+                overflow-x: auto;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body class="night-mode">
+
+    <!-- DAY/NIGHT TOGGLE -->
+    <div class="mode-toggle">
+        <button class="mode-btn sun" onclick="setMode('day')" aria-label="Day mode">
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+        </button>
+        <div class="toggle-divider"></div>
+        <button class="mode-btn moon active" onclick="setMode('night')" aria-label="Night mode">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- HERO SECTION - NYC AERIAL VIEW -->
+    <section class="hero-section" id="hero">
+        <div class="hero-background">
+            <!-- Day Image - NYC Aerial -->
+            <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1920&q=80" 
+                 class="hero-bg-img day-img" 
+                 alt="New York City daytime aerial view">
+            <!-- Night Image - NYC Aerial Night -->
+            <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1920&q=80" 
+                 class="hero-bg-img night-img" 
+                 alt="New York City night aerial view">
+            
+            <div class="hero-overlay"></div>
+            <div class="window-lights" id="windowLights"></div>
+        </div>
+
+        <div class="hero-content">
+            <button class="explore-btn" onclick="scrollToShop()">
+                Explore Collection
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- SHOP THE LOOK - 5 SLIDES -->
+    <section class="shop-look-section" id="shop-look">
+        <div class="shop-look-container">
+            <div class="shop-look-slider" id="shopSlider">
+                <!-- Slide 1: Living Room -->
+                <div class="shop-look-slide">
+                    <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80" class="slide-bg" alt="Living Room">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-label">Shop the Look</div>
+                        <h2 class="slide-title">Living Room</h2>
+                        <p class="slide-description">Warm, inviting spaces designed for connection and relaxation.</p>
+                        <button class="shop-now-btn" onclick="openModal('living-room')">
+                            Shop Now
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Bedroom -->
+                <div class="shop-look-slide">
+                    <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1920&q=80" class="slide-bg" alt="Bedroom">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-label">Shop the Look</div>
+                        <h2 class="slide-title">Bedroom</h2>
+                        <p class="slide-description">Serene retreats crafted for rest and rejuvenation.</p>
+                        <button class="shop-now-btn" onclick="openModal('bedroom')">
+                            Shop Now
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Kitchen & Dining -->
+                <div class="shop-look-slide">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920&q=80" class="slide-bg" alt="Kitchen">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-label">Shop the Look</div>
+                        <h2 class="slide-title">Kitchen & Dining</h2>
+                        <p class="slide-description">Culinary spaces where function meets elegant design.</p>
+                        <button class="shop-now-btn" onclick="openModal('kitchen')">
+                            Shop Now
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Bathroom -->
+                <div class="shop-look-slide">
+                    <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1920&q=80" class="slide-bg" alt="Bathroom">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-label">Shop the Look</div>
+                        <h2 class="slide-title">Bathroom</h2>
+                        <p class="slide-description">Personal sanctuaries of calm and renewal.</p>
+                        <button class="shop-now-btn" onclick="openModal('bathroom')">
+                            Shop Now
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Lighting -->
+                <div class="shop-look-slide">
+                    <img src="https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=1920&q=80" class="slide-bg" alt="Lighting">
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-label">Shop the Look</div>
+                        <h2 class="slide-title">Lighting</h2>
+                        <p class="slide-description">Illumination that transforms atmosphere and mood.</p>
+                        <button class="shop-now-btn" onclick="openModal('lighting')">
+                            Shop Now
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider Navigation -->
+            <div class="slider-arrows">
+                <button class="slider-arrow" onclick="prevSlide()">
+                    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="slider-arrow" onclick="nextSlide()">
+                    <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
+
+            <div class="slider-nav" id="sliderDots">
+                <button class="slider-dot active" onclick="goToSlide(0)"></button>
+                <button class="slider-dot" onclick="goToSlide(1)"></button>
+                <button class="slider-dot" onclick="goToSlide(2)"></button>
+                <button class="slider-dot" onclick="goToSlide(3)"></button>
+                <button class="slider-dot" onclick="goToSlide(4)"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCT MODAL -->
+    <div class="product-modal-overlay" id="productModal">
+        <div class="product-modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Complete the Look</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-products-list" id="modalProducts"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-summary">
+                    <span class="items-count" id="itemsCount">4 items selected</span>
+                    <div class="total-price">
+                        <div class="total-label">Total</div>
+                        <div class="total-amount">
+                            <span class="currency">$</span><span id="totalAmount">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn-add-cart" onclick="addToCart()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                        Add to Cart
+                    </button>
+                    <button class="btn-buy-look" onclick="buyLook()" id="buyLookBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                        Buy Look
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIFESTYLE COLLAGE - WITH FURNITURE IMAGES -->
+    <section class="lifestyle-section" id="lifestyle">
+        <div class="lifestyle-container">
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80" alt="Modern Sofa">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Modern Sofa</div>
+                </div>
+            </div>
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80" alt="Designer Lamp">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Designer Lamp</div>
+                </div>
+            </div>
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=400&q=80" alt="Coffee Table">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Coffee Table</div>
+                </div>
+            </div>
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80" alt="Home Decor">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Home Decor</div>
+                </div>
+            </div>
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=400&q=80" alt="Luxury Bedding">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Luxury Bedding</div>
+                </div>
+            </div>
+            <div class="lifestyle-card">
+                <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&q=80" alt="Accent Chair">
+                <div class="lifestyle-overlay">
+                    <div class="lifestyle-title">Accent Chair</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES HORIZONTAL SLIDER -->
+    <section class="categories-section" id="categories">
+        <h3 class="section-title">Explore by Category</h3>
+        <div class="categories-wrapper">
+            <button class="cat-arrow prev" onclick="slideCategories(-1)">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            
+            <div class="categories-slider" id="catSlider">
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="Sofa">
+                    <div class="category-overlay">
+                        <div class="category-name">Sofa</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600&q=80" alt="Bed">
+                    <div class="category-overlay">
+                        <div class="category-name">Bed</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=600&q=80" alt="Table">
+                    <div class="category-overlay">
+                        <div class="category-name">Table</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1592078615290-033ee584e267?w=600&q=80" alt="Chair">
+                    <div class="category-overlay">
+                        <div class="category-name">Chair</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=600&q=80" alt="Lighting">
+                    <div class="category-overlay">
+                        <div class="category-name">Lighting</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&q=80" alt="Home Decor">
+                    <div class="category-overlay">
+                        <div class="category-name">Home Decor</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80" alt="Office">
+                    <div class="category-overlay">
+                        <div class="category-name">Office</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&q=80" alt="Bathroom">
+                    <div class="category-overlay">
+                        <div class="category-name">Bathroom</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=600&q=80" alt="Beddings">
+                    <div class="category-overlay">
+                        <div class="category-name">Beddings</div>
+                        <div class="category-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="cat-arrow next" onclick="slideCategories(1)">
+                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Initialize Lenis
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Generate Window Lights
+        function generateWindows() {
+            const container = document.getElementById('windowLights');
+            for (let i = 0; i < 60; i++) {
+                const win = document.createElement('div');
+                win.className = 'window';
+                win.style.left = (15 + Math.random() * 70) + '%';
+                win.style.top = (20 + Math.random() * 60) + '%';
+                win.style.animationDelay = Math.random() * 4 + 's';
+                win.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+                container.appendChild(win);
+            }
+            setTimeout(() => {
+                document.querySelectorAll('.window').forEach(w => w.classList.add('active'));
+            }, 100);
+        }
+        generateWindows();
+
+        // Day/Night Mode - Global
+        function setMode(mode) {
+            document.body.className = mode + '-mode';
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.mode-btn.' + mode).classList.add('active');
+            localStorage.setItem('theme', mode);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) setMode(savedTheme);
+
+        // Scroll to Shop
+        function scrollToShop() {
+            lenis.scrollTo('#shop-look');
+        }
+
+        // Shop the Look Slider
+        let currentSlide = 0;
+        const totalSlides = 5;
+        const slider = document.getElementById('shopSlider');
+        const dots = document.querySelectorAll('.slider-dot');
+
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentSlide));
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+        }
+
+        setInterval(nextSlide, 6000);
+
+        // Touch support
+        let touchStartX = 0;
+        slider.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        slider.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+        });
+
+        // Product Data
+        const productsData = {
+            'living-room': [
+                { id: 1, name: 'Cloud Sofa', price: 1240, originalPrice: 1450, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80' },
+                { id: 2, name: 'Minimalist Floor Lamp', price: 189, originalPrice: 220, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80' },
+                { id: 3, name: 'Nordic Coffee Table', price: 420, originalPrice: 490, image: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=400&q=80' },
+                { id: 4, name: 'Ceramic Vase Set', price: 64, originalPrice: 75, image: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=400&q=80' }
+            ],
+            'bedroom': [
+                { id: 5, name: 'Platform Bed Frame', price: 890, originalPrice: 1050, image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400&q=80' },
+                { id: 6, name: 'Linen Bedding Set', price: 180, originalPrice: 210, image: 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=400&q=80' },
+                { id: 7, name: 'Bedside Table', price: 245, originalPrice: 290, image: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=400&q=80' },
+                { id: 8, name: 'Ambient Wall Light', price: 120, originalPrice: 140, image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&q=80' }
+            ],
+            'kitchen': [
+                { id: 9, name: 'Marble Dining Table', price: 1500, originalPrice: 1750, image: 'https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?w=400&q=80' },
+                { id: 10, name: 'Upholstered Dining Chair', price: 280, originalPrice: 330, image: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=400&q=80' },
+                { id: 11, name: 'Pendant Light Trio', price: 340, originalPrice: 400, image: 'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&q=80' },
+                { id: 12, name: 'Kitchen Storage Set', price: 95, originalPrice: 110, image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80' }
+            ],
+            'bathroom': [
+                { id: 13, name: 'Freestanding Bathtub', price: 2200, originalPrice: 2580, image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&q=80' },
+                { id: 14, name: 'Modern Vanity', price: 650, originalPrice: 760, image: 'https://images.unsplash.com/photo-1584622050111-993a426fbf0a?w=400&q=80' },
+                { id: 15, name: 'Towel Warmer', price: 180, originalPrice: 210, image: 'https://images.unsplash.com/photo-1620626012053-1a1c5b8e96e9?w=400&q=80' },
+                { id: 16, name: 'Bath Accessory Set', price: 45, originalPrice: 55, image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&q=80' }
+            ],
+            'lighting': [
+                { id: 17, name: 'Arc Floor Lamp', price: 450, originalPrice: 530, image: 'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&q=80' },
+                { id: 18, name: 'Glass Pendant Light', price: 180, originalPrice: 210, image: 'https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=400&q=80' },
+                { id: 19, name: 'Table Lamp Duo', price: 220, originalPrice: 260, image: 'https://images.unsplash.com/photo-1540932296774-3ed6d23f9b58?w=400&q=80' },
+                { id: 20, name: 'Smart Ceiling Light', price: 320, originalPrice: 375, image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&q=80' }
+            ]
+        };
+
+        let currentProducts = [];
+        let currentCategory = '';
+
+        // Modal Functions
+        function openModal(category) {
+            currentCategory = category;
+            currentProducts = productsData[category].map(p => ({...p, included: true}));
+            
+            document.getElementById('modalTitle').textContent = 'Complete the Look: ' + 
+                category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            renderModal();
+            document.getElementById('productModal').classList.add('active');
+            lenis.stop();
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').classList.remove('active');
+            lenis.start();
+        }
+
+        function renderModal() {
+            const container = document.getElementById('modalProducts');
+            container.innerHTML = currentProducts.map((p, i) => `
+                <div class="modal-product ${!p.included ? 'removed' : ''}">
+                    <img src="${p.image}" class="product-img" alt="${p.name}">
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">
+                            $${p.price}
+                            ${p.included ? `<span class="product-original-price">$${p.originalPrice}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="product-actions">
+                        ${p.included ? `
+                            <button class="btn-toggle" onclick="toggleProduct(${i})" title="Remove">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        ` : `
+                            <button class="btn-add-back" onclick="toggleProduct(${i})">Add Back</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+            
+            updateTotal();
+        }
+
+        function toggleProduct(index) {
+            currentProducts[index].included = !currentProducts[index].included;
+            renderModal();
+        }
+
+        function updateTotal() {
+            const included = currentProducts.filter(p => p.included);
+            const total = included.reduce((sum, p) => sum + p.price, 0);
+            
+            document.getElementById('itemsCount').textContent = 
+                `${included.length} item${included.length !== 1 ? 's' : ''} selected`;
+            document.getElementById('totalAmount').textContent = total;
+            
+            const buyBtn = document.getElementById('buyLookBtn');
+            buyBtn.disabled = included.length === 0;
+            if (included.length === 0) {
+                buyBtn.innerHTML = 'Select at least 1 item';
+            } else {
+                buyBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    Buy Look
+                `;
+            }
+        }
+
+        function addToCart() {
+            const included = currentProducts.filter(p => p.included);
+            if (included.length === 0) return;
+            alert(`Added ${included.length} items to cart!`);
+            closeModal();
+        }
+
+        function buyLook() {
+            const included = currentProducts.filter(p => p.included);
+            if (included.length === 0) return;
+            const total = included.reduce((sum, p) => sum + p.price, 0);
+            alert(`Proceeding to checkout: $${total}`);
+            closeModal();
+        }
+
+        // Close modal on overlay click
+        document.getElementById('productModal').addEventListener('click', (e) => {
+            if (e.target.id === 'productModal') closeModal();
+        });
+
+        // Categories Slider
+        let catPosition = 0;
+        const catSlider = document.getElementById('catSlider');
+        const catCards = document.querySelectorAll('.category-card');
+        
+        function getVisibleCards() {
+            if (window.innerWidth > 1200) return 5;
+            if (window.innerWidth > 992) return 4;
+            if (window.innerWidth > 768) return 3;
+            if (window.innerWidth > 480) return 2;
+            return 1;
+        }
+        
+        function slideCategories(direction) {
+            const visible = getVisibleCards();
+            const maxPos = Math.max(0, catCards.length - visible);
+            catPosition += direction;
+            catPosition = Math.max(0, Math.min(catPosition, maxPos));
+            
+            const cardWidth = catCards[0].offsetWidth + 24;
+            catSlider.style.transform = `translateX(-${catPosition * cardWidth}px)`;
+        }
+
+        // Touch support for categories
+        let catTouchStart = 0;
+        catSlider.addEventListener('touchstart', e => catTouchStart = e.touches[0].clientX);
+        catSlider.addEventListener('touchend', e => {
+            const diff = catTouchStart - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) diff > 0 ? slideCategories(1) : slideCategories(-1);
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.from('.slide-content', {
+            scrollTrigger: { trigger: '.shop-look-section', start: 'top 80%' },
+            y: 50, opacity: 0, duration: 0.8, stagger: 0.2
+        });
+
+        gsap.from('.lifestyle-card', {
+            scrollTrigger: { trigger: '.lifestyle-section', start: 'top 75%' },
+            y: 80, opacity: 0, rotation: -5, duration: 0.6, stagger: 0.1, ease: 'back.out(1.7)'
+        });
+
+        gsap.from('.category-card', {
+            scrollTrigger: { trigger: '.categories-section', start: 'top 80%' },
+            y: 40, opacity: 0, duration: 0.5, stagger: 0.08
+        });
+    </script>
+</body>
+</html>
