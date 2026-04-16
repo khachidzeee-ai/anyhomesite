@@ -1,0 +1,1 @@
+// LifestyleCollage.jsx code here
